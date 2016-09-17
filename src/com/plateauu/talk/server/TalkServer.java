@@ -9,8 +9,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.plateauu.talk.domain.UserService;
-
 public class TalkServer {
 
 	int port = 13333;
@@ -18,6 +16,7 @@ public class TalkServer {
 	PrintWriter out;
 	String inputLine, outputLine;
 	List<PrintWriter> usersOutStreams;
+	List<String> names;
 
 	public TalkServer() {
 
@@ -26,37 +25,79 @@ public class TalkServer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public void establishServer() throws IOException {
 
 		usersOutStreams = new ArrayList<>();
-		
+		names = new ArrayList<>();
+		int counter = 0;
+
 		ServerSocket serverSocket = new ServerSocket(port);
 
 		while (true) {
+
 			Socket clientSocket = serverSocket.accept();
 
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 			usersOutStreams.add(out);
-			System.out.println();
-			
-			Runnable newUser = new UserService(clientSocket, this);
+
+			Runnable newUser = new UserService(clientSocket);
 			Thread t = new Thread(newUser);
+			t.setName(++counter + "user");
 			t.start();
 
-			System.out.println("[SERVER] Connection established");
-			out.println("Connection established");
-			
+			System.out.println("[SERVER]" + t.getName() + " Connected");
+			out.println("Welcome to localhost");
+		}
 
+	}
+
+	public class UserService implements Runnable {
+
+		Socket clientSocket;
+
+		public UserService(Socket clientSocket) {
+			this.clientSocket = clientSocket;
+		}
+
+		@Override
+		public void run() {
+			String message;
+			String[] messageArray;
+
+			try {
+				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		
+				while ((message = in.readLine()) != null) {
+					System.out.println("Incoming message: " + message);
+					
+					if (message.contains("/name ")) {
+						messageArray = message.split(" ");
+						if (messageArray[1].length() > 0) {
+							names.add(messageArray[1]);
+							out.println("<Server> Welcome " + messageArray[1]);
+						}
+					} else {
+						messageArray = message.split("//");
+						if (messageArray.length > 1) {
+							broadcastToAll(messageArray);
+						}
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
-	
+
 	public void broadcastToAll(String[] messageArray) {
-		for (PrintWriter userOutput : usersOutStreams){
-			userOutput.println("<" + messageArray[0] + "> " + messageArray[1] );
+		if (messageArray.length > 1) {
+			for (PrintWriter userOutput : usersOutStreams) {
+				userOutput.println("<" + messageArray[0] + "> " + messageArray[1]);
+			}
 		}
+
 	}
 
 }

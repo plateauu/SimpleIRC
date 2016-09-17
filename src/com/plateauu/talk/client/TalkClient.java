@@ -11,41 +11,65 @@ public class TalkClient {
 	String name;
 	String hostname;
 	int portNumber;
-	String fromServer, fromUser;
-	
-	public TalkClient(String hostname, int porttNumber, String name){
+	BufferedReader in;
+	PrintWriter out;
+
+	public TalkClient(String hostname, int porttNumber, String name) {
 		this.hostname = hostname;
 		this.portNumber = porttNumber;
 		this.name = name;
 		establishConnection();
 	}
-	
-	private void establishConnection(){
-		try {
-			Socket clientSocket= new Socket(hostname, portNumber);
-			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			System.out.println("[TALK_CLIENT] Connection established");
-			startTalking(in, out);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void startTalking(BufferedReader in, PrintWriter out){
-		Scanner scan = new Scanner(System.in);
-		
-		try {
-			while ((fromServer = in.readLine()) != null){
-				System.out.println(fromServer);
-				fromUser = scan.nextLine();
-				if(fromUser != null){
-					out.println(this.name + "//" + fromUser);
+
+	public class ComunnicationReciever implements Runnable {
+
+		@Override
+		public void run() {
+			String message;
+			try {
+				while ((message = in.readLine()) != null) {
+					System.out.println(message);
 				}
+			} catch (Exception e) {
+				System.err.println();
 			}
+		}
+	}
+
+	private void establishConnection() {
+		try {
+			Socket clientSocket = new Socket(hostname, portNumber);
+			out = new PrintWriter(clientSocket.getOutputStream(), true);
+			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			System.out.println("["+ name + "] Connection established");
+
+			Thread t = new Thread(new ComunnicationReciever());
+			t.start();
+			
+			sendName();
+			
+			startTalking();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
+	private void sendName() {
+		out.println("/name " + name);
+		
+	}
+
+	private void startTalking() {
+		String message;
+		Scanner scan = new Scanner(System.in);
+
+		while (true) {
+			message = scan.nextLine();
+			if (message.length() > 0) {
+				out.println(this.name + "//" + message);
+			}
+		}
+	}
+
 }
