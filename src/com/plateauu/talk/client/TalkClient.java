@@ -8,23 +8,24 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class TalkClient {
+	String name;
 	String hostname;
 	int portNumber;
 	String fromServer, fromUser;
 	
-	public TalkClient(String hostname, int porttNumber){
+	public TalkClient(String hostname, int porttNumber, String name){
 		this.hostname = hostname;
 		this.portNumber = porttNumber;
-		prepareConnection();
+		this.name = name;
+		establishConnection();
 	}
 	
-	private void prepareConnection(){
+	private void establishConnection(){
 		try {
 			Socket clientSocket= new Socket(hostname, portNumber);
 			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			out.println(">>  Connection establised");
-			System.out.println("[CLIENT] Connection established");
+			System.out.println("[TALK_CLIENT] Connection established");
 			startTalking(in, out);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -33,16 +34,13 @@ public class TalkClient {
 	
 	private void startTalking(BufferedReader in, PrintWriter out){
 		Scanner scan = new Scanner(System.in);
+		
 		try {
 			while ((fromServer = in.readLine()) != null){
-				System.out.println("<SERVER> " + fromServer);
-				if(fromServer.equals("bye.")){
-					break;
-				}
+				System.out.println(fromServer);
 				fromUser = scan.nextLine();
 				if(fromUser != null){
-					System.out.println("<CLIENT> "+ fromUser);
-					out.println(fromUser);
+					out.println(this.name + "//" + fromUser);
 				}
 			}
 		} catch (IOException e) {

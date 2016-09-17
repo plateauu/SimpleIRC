@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.plateauu.talk.domain.Users;
+import com.plateauu.talk.domain.UserService;
 
 public class TalkServer {
 
@@ -17,50 +17,45 @@ public class TalkServer {
 	BufferedReader in;
 	PrintWriter out;
 	String inputLine, outputLine;
-	List<Users> users;
-	
+	List<PrintWriter> usersOutStreams;
 
 	public TalkServer() {
-		
-		users = new ArrayList<>();
 
 		try {
 			establishServer();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		;
-		
-		
 
 	}
 
 	public void establishServer() throws IOException {
-		BufferedReader in;
-		PrintWriter out;
+
+		usersOutStreams = new ArrayList<>();
 		
 		ServerSocket serverSocket = new ServerSocket(port);
-		Socket clientSocket = serverSocket.accept();
-		
-		out = new PrintWriter(clientSocket.getOutputStream(), true);
-		in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		users.add(new Users("Name", in, out));
-		
-		System.out.println("[SERVER] Connection established");
-		out.println("Connection established");
-		startListen();
-	} 	
 
+		while (true) {
+			Socket clientSocket = serverSocket.accept();
+
+			out = new PrintWriter(clientSocket.getOutputStream(), true);
+			usersOutStreams.add(out);
+			System.out.println();
+			
+			Runnable newUser = new UserService(clientSocket, this);
+			Thread t = new Thread(newUser);
+			t.start();
+
+			System.out.println("[SERVER] Connection established");
+			out.println("Connection established");
+			
+
+		}
+	}
 	
-	private void startListen() {
-		try {
-				while ((inputLine = in.readLine()) != null) {
-				System.out.println("<CLIENT> " + inputLine );
-				users.get(0).getOut().println("SERVER >> " + inputLine);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+	public void broadcastToAll(String[] messageArray) {
+		for (PrintWriter userOutput : usersOutStreams){
+			userOutput.println("<" + messageArray[0] + "> " + messageArray[1] );
 		}
 	}
 
