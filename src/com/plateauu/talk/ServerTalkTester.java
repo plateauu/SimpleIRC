@@ -1,6 +1,6 @@
-package com.plateauu.talk.server;
+package com.plateauu.talk;
 
-import com.plateauu.talk.TalkServer;
+import com.plateauu.talk.server.TalkServer;
 
 public class ServerTalkTester {
 	public static void main(String[] args){

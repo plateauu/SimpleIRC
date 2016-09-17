@@ -1,4 +1,4 @@
-package com.plateauu.talk;
+package com.plateauu.talk.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;

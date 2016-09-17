@@ -1,6 +1,6 @@
-package com.plateauu.talk.client;
+package com.plateauu.talk;
 
-import com.plateauu.talk.TalkClient;
+import com.plateauu.talk.client.TalkClient;
 
 public class ClientTalkTester {
 	public static void main(String[] args){
