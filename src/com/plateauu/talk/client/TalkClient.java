@@ -7,6 +7,12 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
+
+/*
+ * TODO: change name implementation
+ * 
+ */
+
 public class TalkClient {
 	String name;
 	String hostname;
@@ -71,5 +77,7 @@ public class TalkClient {
 			}
 		}
 	}
+	
+	
 
 }

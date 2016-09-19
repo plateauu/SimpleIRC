@@ -64,31 +64,64 @@ public class TalkServer {
 		@Override
 		public void run() {
 			String message;
-			String[] messageArray;
 
 			try {
 				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		
+
 				while ((message = in.readLine()) != null) {
 					System.out.println("Incoming message: " + message);
-					
-					if (message.contains("/name ")) {
-						messageArray = message.split(" ");
-						if (messageArray[1].length() > 0) {
-							names.add(messageArray[1]);
-							out.println("<Server> Welcome " + messageArray[1]);
-						}
-					} else {
-						messageArray = message.split("//");
-						if (messageArray.length > 1) {
-							broadcastToAll(messageArray);
-						}
-					}
+
+					resolveClientRequest(message);
+
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+
+		private void resolveClientRequest(String message) {
+			String[] messageArray = message.split("//");
+
+			String actualName = messageArray[0];
+			int actualNameIndex = getUserNameIndex(actualName);
+
+			if (message.contains("/name ")) {
+				messageArray = message.split(" ");
+				String newName = messageArray[1];
+				if (newName.length() > 0) {
+					
+					int index = getUserNameIndex(newName);
+					if (index == -1) {
+						if (actualNameIndex != -1){
+							names.remove(actualNameIndex);
+						}
+						names.add(newName);
+						out.println("<Server> Welcome " + newName);
+
+					} else {
+						System.out.println("[" + actualName + "]" + "Name " + messageArray[1] + " is not available");
+						out.println("[" + actualName + "]" + "Name " + messageArray[1] + " is not available");
+					}
+				}
+			} else
+
+			{
+				messageArray = message.split("//");
+				if (messageArray.length > 1) {
+					broadcastToAll(messageArray);
+				}
+			}
+		}
+
+		private int getUserNameIndex(String name) {
+			int index = -1;
+			for (String user:names){
+				if(user.equals(name))
+				index = names.indexOf(user);
+			}
+			return index;
+		}
+
 	}
 
 	public void broadcastToAll(String[] messageArray) {
