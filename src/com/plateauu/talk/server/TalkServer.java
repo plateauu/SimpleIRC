@@ -88,20 +88,9 @@ public class TalkServer {
 			if (message.contains("/name ")) {
 				messageArray = message.split(" ");
 				String newName = messageArray[1];
-				if (newName.length() > 0) {
-					
-					int index = getUserNameIndex(newName);
-					if (index == -1) {
-						if (actualNameIndex != -1){
-							names.remove(actualNameIndex);
-						}
-						names.add(newName);
-						out.println("<Server> Welcome " + newName);
 
-					} else {
-						System.out.println("[" + actualName + "]" + "Name " + messageArray[1] + " is not available");
-						out.println("[" + actualName + "]" + "Name " + messageArray[1] + " is not available");
-					}
+				if (newName.length() > 0) {
+					commandChangeName(messageArray, actualName, actualNameIndex, newName);
 				}
 			} else
 
@@ -113,11 +102,26 @@ public class TalkServer {
 			}
 		}
 
+		public void commandChangeName(String[] messageArray, String actualName, int actualNameIndex, String newName) {
+			int index = getUserNameIndex(newName);
+			if (index == -1) {
+				if (actualNameIndex != -1) {
+					names.remove(actualNameIndex);
+				}
+				names.add(newName);
+				out.println("commands//name//" + newName);
+
+			} else {
+				System.out.println("[" + actualName + "]" + "Name " + messageArray[1] + " is not available");
+				out.println("[" + actualName + "]" + "Name " + messageArray[1] + " is not available");
+			}
+		}
+
 		private int getUserNameIndex(String name) {
 			int index = -1;
-			for (String user:names){
-				if(user.equals(name))
-				index = names.indexOf(user);
+			for (String user : names) {
+				if (user.equals(name))
+					index = names.indexOf(user);
 			}
 			return index;
 		}

@@ -7,18 +7,25 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-
 /*
  * TODO: change name implementation
  * 
  */
 
 public class TalkClient {
-	String name;
-	String hostname;
-	int portNumber;
-	BufferedReader in;
-	PrintWriter out;
+	private String name;
+	private String hostname;
+	private int portNumber;
+	private BufferedReader in;
+	private PrintWriter out;
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getName(){
+		return name;
+	}
 
 	public TalkClient(String hostname, int porttNumber, String name) {
 		this.hostname = hostname;
@@ -34,28 +41,47 @@ public class TalkClient {
 			String message;
 			try {
 				while ((message = in.readLine()) != null) {
-					System.out.println(message);
+					boolean command = recieveCommands(message);
+					if (!command) {
+						System.out.println(message);
+					}
 				}
 			} catch (Exception e) {
 				System.err.println();
 			}
 		}
+
+		private boolean recieveCommands(String message) {
+			String[] command = message.split("//");
+			if(command[0].equals("commands")){
+				switch(command[1].toLowerCase()){
+				case "name":
+					setName(command[2]);
+					System.out.println("Switched name to " + getName() );
+					return true;
+				default:
+					return false;
+				}
+			}
+			return false;
+		}
 	}
 
+	
 	private void establishConnection() {
 		try {
 			Socket clientSocket = new Socket(hostname, portNumber);
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			System.out.println("["+ name + "] Connection established");
+			System.out.println("[" + name + "] Connection established");
 
 			Thread t = new Thread(new ComunnicationReciever());
 			t.start();
-			
+
 			sendName();
-			
+
 			startTalking();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -63,7 +89,7 @@ public class TalkClient {
 
 	private void sendName() {
 		out.println("/name " + name);
-		
+
 	}
 
 	private void startTalking() {
@@ -77,7 +103,5 @@ public class TalkClient {
 			}
 		}
 	}
-	
-	
 
 }
