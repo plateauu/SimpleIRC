@@ -9,14 +9,18 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/*
+ * TODO: Check why it doesn't remove names from namesList
+ */
+
 public class TalkServer {
 
-	int port = 13333;
-	BufferedReader in;
-	PrintWriter out;
-	String inputLine, outputLine;
-	List<PrintWriter> usersOutStreams;
-	List<String> names;
+	private int port = 13333;
+	private BufferedReader in;
+	private PrintWriter out;
+	private List<PrintWriter> usersOutStreams;
+	private List<String> namesList;
 
 	public TalkServer() {
 
@@ -30,7 +34,7 @@ public class TalkServer {
 	public void establishServer() throws IOException {
 
 		usersOutStreams = new ArrayList<>();
-		names = new ArrayList<>();
+		namesList = new ArrayList<>();
 		int counter = 0;
 
 		ServerSocket serverSocket = new ServerSocket(port);
@@ -38,11 +42,10 @@ public class TalkServer {
 		while (true) {
 
 			Socket clientSocket = serverSocket.accept();
-
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 			usersOutStreams.add(out);
-
-			Runnable newUser = new UserService(clientSocket);
+			
+			Runnable newUser = new UserService(clientSocket, out, this);
 			Thread t = new Thread(newUser);
 			t.setName(++counter + "user");
 			t.start();
@@ -53,79 +56,12 @@ public class TalkServer {
 
 	}
 
-	public class UserService implements Runnable {
+	public List<String> getNamesList() {
+		return namesList;
+	}
 
-		Socket clientSocket;
-
-		public UserService(Socket clientSocket) {
-			this.clientSocket = clientSocket;
-		}
-
-		@Override
-		public void run() {
-			String message;
-
-			try {
-				in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-				while ((message = in.readLine()) != null) {
-					System.out.println("Incoming message: " + message);
-
-					resolveClientRequest(message);
-
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		private void resolveClientRequest(String message) {
-			String[] messageArray = message.split("//");
-
-			String actualName = messageArray[0];
-			int actualNameIndex = getUserNameIndex(actualName);
-
-			if (message.contains("/name ")) {
-				messageArray = message.split(" ");
-				String newName = messageArray[1];
-
-				if (newName.length() > 0) {
-					commandChangeName(messageArray, actualName, actualNameIndex, newName);
-				}
-			} else
-
-			{
-				messageArray = message.split("//");
-				if (messageArray.length > 1) {
-					broadcastToAll(messageArray);
-				}
-			}
-		}
-
-		public void commandChangeName(String[] messageArray, String actualName, int actualNameIndex, String newName) {
-			int index = getUserNameIndex(newName);
-			if (index == -1) {
-				if (actualNameIndex != -1) {
-					names.remove(actualNameIndex);
-				}
-				names.add(newName);
-				out.println("commands//name//" + newName);
-
-			} else {
-				System.out.println("[" + actualName + "]" + "Name " + messageArray[1] + " is not available");
-				out.println("[" + actualName + "]" + "Name " + messageArray[1] + " is not available");
-			}
-		}
-
-		private int getUserNameIndex(String name) {
-			int index = -1;
-			for (String user : names) {
-				if (user.equals(name))
-					index = names.indexOf(user);
-			}
-			return index;
-		}
-
+	public void addName(String name) {
+		this.namesList.add(name);
 	}
 
 	public void broadcastToAll(String[] messageArray) {
@@ -137,4 +73,14 @@ public class TalkServer {
 
 	}
 
+	public int getUserNameIndex(String name) {
+		int index = -1;
+		for (String user : namesList) {
+			if (user.equals(name))
+				index = namesList.indexOf(user);
+		}
+		return index;
+	}
+
+	
 }

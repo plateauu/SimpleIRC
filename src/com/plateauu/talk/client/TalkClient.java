@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 /*
- * TODO: change name implementation
+ *   
  * 
  */
 
@@ -34,39 +34,6 @@ public class TalkClient {
 		establishConnection();
 	}
 
-	public class ComunnicationReciever implements Runnable {
-
-		@Override
-		public void run() {
-			String message;
-			try {
-				while ((message = in.readLine()) != null) {
-					boolean command = recieveCommands(message);
-					if (!command) {
-						System.out.println(message);
-					}
-				}
-			} catch (Exception e) {
-				System.err.println();
-			}
-		}
-
-		private boolean recieveCommands(String message) {
-			String[] command = message.split("//");
-			if(command[0].equals("commands")){
-				switch(command[1].toLowerCase()){
-				case "name":
-					setName(command[2]);
-					System.out.println("Switched name to " + getName() );
-					return true;
-				default:
-					return false;
-				}
-			}
-			return false;
-		}
-	}
-
 	
 	private void establishConnection() {
 		try {
@@ -75,11 +42,10 @@ public class TalkClient {
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			System.out.println("[" + name + "] Connection established");
 
-			Thread t = new Thread(new ComunnicationReciever());
+			Thread t = new Thread(new CommunicationReciever(in, this, clientSocket));
 			t.start();
 
-			sendName();
-
+			logInServer();
 			startTalking();
 
 		} catch (IOException e) {
@@ -87,7 +53,7 @@ public class TalkClient {
 		}
 	}
 
-	private void sendName() {
+	private void logInServer() {
 		out.println("/name " + name);
 
 	}
