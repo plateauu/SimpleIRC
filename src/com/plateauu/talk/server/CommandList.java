@@ -4,25 +4,23 @@ import java.util.List;
 
 public class CommandList implements Commandable {
 
-	List<String> namesList;
+    List<String> namesList;
 
-	public CommandList(List<String> namesList) {
-			this.namesList = namesList;
-	}
+    public CommandList(List<String> namesList) {
+        this.namesList = namesList;
+    }
 
-	@Override
-	public String makeAnAction() {
-		StringBuilder list = new StringBuilder();
-		
-		list.append("commands//list//");
-		
-		for (String name : namesList){
-			list.append(name.toString());
-			list.append(", ");
-		}
-		
-		
-		return list.toString();
-	}
+    @Override
+    public String makeAnAction() {
+        StringBuilder list = new StringBuilder();
+
+        list.append("commands//list//");
+        for (String name : namesList) {
+            list.append(name.toString());
+            list.append(", ");
+        }
+
+        return list.toString();
+    }
 
 }

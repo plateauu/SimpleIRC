@@ -11,63 +11,62 @@ import java.util.Scanner;
  *   
  * 
  */
-
 public class TalkClient {
-	private String name;
-	private String hostname;
-	private int portNumber;
-	private BufferedReader in;
-	private PrintWriter out;
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getName(){
-		return name;
-	}
+    private String name;
+    private String hostname;
+    private int portNumber;
+    private BufferedReader in;
+    private PrintWriter out;
 
-	public TalkClient(String hostname, int porttNumber, String name) {
-		this.hostname = hostname;
-		this.portNumber = porttNumber;
-		this.name = name;
-		establishConnection();
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	
-	private void establishConnection() {
-		try {
-			Socket clientSocket = new Socket(hostname, portNumber);
-			out = new PrintWriter(clientSocket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			System.out.println("[" + name + "] Connection established");
+    public String getName() {
+        return name;
+    }
 
-			Thread t = new Thread(new CommunicationReciever(in, this, clientSocket));
-			t.start();
+    public TalkClient(String hostname, int porttNumber, String name) {
+        this.hostname = hostname;
+        this.portNumber = porttNumber;
+        this.name = name;
+        establishConnection();
+    }
 
-			logInServer();
-			startTalking();
+    private void establishConnection() {
+        try {
+            Socket clientSocket = new Socket(hostname, portNumber);
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            System.out.println("[" + name + "] Connection established");
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+            Thread t = new Thread(new CommunicationReciever(in, this, clientSocket));
+            t.start();
 
-	private void logInServer() {
-		out.println("/name " + name);
+            logInServer();
+            startTalking();
 
-	}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	private void startTalking() {
-		String message;
-		Scanner scan = new Scanner(System.in);
+    private void logInServer() {
+        out.println("/name " + name);
 
-		while (true) {
-			message = scan.nextLine();
-			if (message.length() > 0) {
-				out.println(this.name + "//" + message);
-			}
-		}
-	}
+    }
+
+    private void startTalking() {
+        String message;
+        Scanner scan = new Scanner(System.in);
+
+        while (true) {
+            message = scan.nextLine();
+            if (message.length() > 0) {
+                out.println(this.name + "//" + message);
+            }
+        }
+    }
 
 }
