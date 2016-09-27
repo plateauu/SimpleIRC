@@ -7,15 +7,14 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-/*
- *   
- * 
- */
+// TODO: make a message object (isCommand:Boolean, messageBody:String, Command:Enum
+
+
 public class TalkClient {
 
     private String name;
-    private String hostname;
-    private int portNumber;
+    private final String hostname;
+    private final int portNumber;
     private BufferedReader in;
     private PrintWriter out;
 
@@ -48,7 +47,7 @@ public class TalkClient {
             startTalking();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error");
         }
     }
 
@@ -68,5 +67,7 @@ public class TalkClient {
             }
         }
     }
+    
+    
 
 }

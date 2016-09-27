@@ -11,7 +11,7 @@ public class CommandList implements Commandable {
     }
 
     @Override
-    public String makeAnAction() {
+    public String performCommand() {
         StringBuilder list = new StringBuilder();
 
         list.append("commands//list//");

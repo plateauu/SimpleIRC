@@ -12,6 +12,7 @@ import java.util.List;
 /*
  * TODO: Check why it doesn't remove names from namesList
  */
+
 public class TalkServer {
 
     private int port = 13333;
@@ -20,12 +21,8 @@ public class TalkServer {
     private List<PrintWriter> usersOutStreams;
     private List<String> namesList;
 
-    public TalkServer() {
-
-        try {
+    public TalkServer() throws IOException {
             establishServer();
-        } catch (IOException e) {
-        }
     }
 
     public void establishServer() throws IOException {
@@ -37,15 +34,11 @@ public class TalkServer {
         ServerSocket serverSocket = new ServerSocket(port);
 
         while (true) {
-
             Socket clientSocket = serverSocket.accept();
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             usersOutStreams.add(out);
 
-            Runnable newUser = new UserService(clientSocket, out, this);
-            Thread t = new Thread(newUser);
-            t.setName(++counter + "user");
-            t.start();
+            Thread t = createThread(clientSocket, counter);
 
             System.out.println("[SERVER]" + t.getName() + " Connected");
             out.println("Welcome to localhost");
@@ -53,9 +46,19 @@ public class TalkServer {
 
     }
 
+    private Thread createThread(Socket clientSocket, int counter) {
+        Runnable newUser = new UserService(clientSocket, out, this);
+        Thread t = new Thread(newUser);
+        t.setName(++counter + " user");
+        t.start();
+        return t;
+    }
+
     public List<String> getNamesList() {
         return namesList;
     }
+    
+    
 
     public void addName(String name) {
         this.namesList.add(name);
@@ -78,4 +81,15 @@ public class TalkServer {
         }
         return index;
     }
+
+    boolean isUserExists(String name) {
+        int index = getUserNameIndex(name);
+        if (index == -1) {
+        return false;
+        } else {
+            return true;
+        }
+    }
+    
+    
 }

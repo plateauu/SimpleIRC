@@ -6,11 +6,11 @@ public class RecieveList implements Recieveable {
 
     public RecieveList(String names) {
         this.names = names;
-        actOnRecieve();
+        performAction();
     }
 
     @Override
-    public void actOnRecieve() {
+    public void performAction() {
         System.out.println("Currently on server:");
         System.out.println(names);
     }

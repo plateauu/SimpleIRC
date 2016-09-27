@@ -32,32 +32,45 @@ public class UserService implements Runnable {
                 System.out.println("Incoming message: " + message);
                 resolveClientRequest(message);
             }
+
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getCause());
+            System.out.println(e.getClass());
+            System.out.println(e.getMessage());
+            System.out.println(e.getStackTrace());
         }
     }
 
     private void resolveClientRequest(String message) {
         String[] messageArray = message.split("//");
         String actualName = messageArray[0];
+        Boolean isCommand = isCommand(message);
 
-        if (message.contains("/name ")) {
-            messageArray = message.split(" ");
-            String newName = messageArray[1];
-            if (newName.length() > 0) {
-                Commandable changeName = new CommandChangeName(messageArray, actualName, newName, server);
-                out.println(changeName.makeAnAction());
+        if (isCommand) {
+            if (message.contains("/name ")) {
+                messageArray = message.split(" ");
+                String newName = messageArray[1];
+
+                if (newName.length() > 0) {
+                    Commandable changeName = new CommandName(messageArray, actualName, newName, server);
+                    out.println(changeName.performCommand());
+                }
             }
-        } else if (message.contains("/list")) {
-            Commandable list = new CommandList(server.getNamesList());
-            out.println(list.makeAnAction());
 
+            if (message.contains("/list")) {
+                Commandable list = new CommandList(server.getNamesList());
+                out.println(list.performCommand());
+            }
         } else {
             messageArray = message.split("//");
             if (messageArray.length > 1) {
                 server.broadcastToAll(messageArray);
             }
         }
+    }
+
+    private Boolean isCommand(String message) {
+        return message.contains("///");
     }
 
 }
