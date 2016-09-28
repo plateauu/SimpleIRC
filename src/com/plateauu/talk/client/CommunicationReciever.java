@@ -7,7 +7,6 @@ public class CommunicationReciever implements Runnable {
 
     private BufferedReader in;
     private TalkClient client;
-    private Socket clientSocket;
 
     public CommunicationReciever(BufferedReader in, TalkClient client, Socket clientSocket) {
         this.in = in;
@@ -25,7 +24,7 @@ public class CommunicationReciever implements Runnable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("ERROR");
+            System.out.println("Oups");
         }
     }
 

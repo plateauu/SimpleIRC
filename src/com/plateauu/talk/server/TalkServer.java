@@ -8,11 +8,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/*
- * TODO: Check why it doesn't remove names from namesList
- */
-
 public class TalkServer {
 
     private int port = 13333;
@@ -22,7 +17,7 @@ public class TalkServer {
     private List<String> namesList;
 
     public TalkServer() throws IOException {
-            establishServer();
+        establishServer();
     }
 
     public void establishServer() throws IOException {
@@ -57,8 +52,6 @@ public class TalkServer {
     public List<String> getNamesList() {
         return namesList;
     }
-    
-    
 
     public void addName(String name) {
         this.namesList.add(name);
@@ -85,11 +78,10 @@ public class TalkServer {
     boolean isUserExists(String name) {
         int index = getUserNameIndex(name);
         if (index == -1) {
-        return false;
+            return false;
         } else {
             return true;
         }
     }
-    
-    
+
 }
