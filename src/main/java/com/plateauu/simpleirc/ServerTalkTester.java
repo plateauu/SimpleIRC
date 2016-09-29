@@ -1,6 +1,6 @@
-package com.plateauu.talk;
+package com.plateauu.simpleirc;
 
-import com.plateauu.talk.server.TalkServer;
+import com.plateauu.simpleirc.server.TalkServer;
 import java.io.IOException;
 
 public class ServerTalkTester {

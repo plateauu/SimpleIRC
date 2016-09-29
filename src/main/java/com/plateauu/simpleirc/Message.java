@@ -1,9 +1,9 @@
-package com.plateauu.talk;
+package com.plateauu.simpleirc;
 
 import java.util.List;
 
 public class Message {
-    
+
     private String senderName;
     private Boolean isCommand;
     private Commands command;
@@ -16,13 +16,12 @@ public class Message {
         this.command = command;
         this.commandArguments = arguments;
     }
-    
+
     public Message(String name, Boolean isCommand, String message) {
         this.senderName = name;
         this.isCommand = isCommand;
         this.message = message;
-    }    
-
+    }
 
     public String getName() {
         return senderName;
@@ -40,6 +39,10 @@ public class Message {
         return commandArguments;
     }
 
+    public String getCommandParameter(int indexOf) {
+        return commandArguments.get(indexOf);
+    }
+
     public String getMessage() {
         return message;
     }
@@ -48,7 +51,5 @@ public class Message {
     public String toString() {
         return "Message{" + "name=" + senderName + ", isCommand=" + isCommand + ", command=" + command + ", commandParameter=" + commandArguments + ", message=" + message + '}';
     }
-    
-    
-    
+
 }

@@ -1,4 +1,4 @@
-package com.plateauu.talk.client;
+package com.plateauu.simpleirc.client;
 
 public class RecieveList implements Recieveable {
 

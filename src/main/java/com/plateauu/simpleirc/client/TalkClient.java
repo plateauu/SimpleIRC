@@ -1,25 +1,26 @@
-package com.plateauu.talk.client;
+package com.plateauu.simpleirc.client;
 
-import com.plateauu.talk.Commands;
-import com.plateauu.talk.Message;
-import java.io.BufferedReader;
+import com.plateauu.simpleirc.Commands;
+import com.plateauu.simpleirc.Message;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // TODO: make a message object (isCommand:Boolean, messageBody:String, Command:Enum
+
 public class TalkClient {
 
     private String name;
     private final String hostname;
     private final int portNumber;
-    private BufferedReader in;
-    private PrintWriter out;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
 
     public void setName(String name) {
         this.name = name;
@@ -39,13 +40,9 @@ public class TalkClient {
     private void establishConnection() {
         try {
             Socket clientSocket = new Socket(hostname, portNumber);
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            
-            //todo: zmienić out i in na ObjectInputStream i ObjectOUtputStream
-            //http://stackoverflow.com/questions/3365261/does-a-buffered-objectinputstream-exist
-            
-            
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
+
+            in = new ObjectInputStream(clientSocket.getInputStream());
             System.out.println("[" + name + "] Connection established");
 
             Thread t = new Thread(new CommunicationReciever(in, this, clientSocket));
@@ -55,12 +52,17 @@ public class TalkClient {
             startTalking();
 
         } catch (IOException e) {
-            System.out.println("Error");
+            e.printStackTrace();
         }
     }
 
     private void logInServer() {
-        out.println("/name " + name);
+        try {
+            Message message = messageCreator("/name " + name);
+            out.writeObject(message);
+        } catch (IOException ex) {
+            Logger.getLogger(TalkClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
@@ -69,10 +71,14 @@ public class TalkClient {
         Scanner scan = new Scanner(System.in);
 
         while (true) {
-            messageBody = scan.nextLine();
-            if (messageBody.length() > 0) {
-                Message message = messageCreator(messageBody);
-                out.println(message);
+            try {
+                messageBody = scan.nextLine();
+                if (messageBody.length() > 0) {
+                    Message message = messageCreator(messageBody);
+                    out.writeObject(message);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(TalkClient.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

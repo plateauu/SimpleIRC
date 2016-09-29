@@ -1,4 +1,4 @@
-package com.plateauu.talk.server;
+package com.plateauu.simpleirc.server;
 
 import java.util.List;
 

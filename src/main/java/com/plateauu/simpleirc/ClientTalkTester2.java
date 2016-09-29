@@ -1,6 +1,6 @@
-package com.plateauu.talk;
+package com.plateauu.simpleirc;
 
-import com.plateauu.talk.client.TalkClient;
+import com.plateauu.simpleirc.client.TalkClient;
 
 public class ClientTalkTester2 {
 	public static void main(String[] args){

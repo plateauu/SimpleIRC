@@ -1,4 +1,4 @@
-package com.plateauu.talk;
+package com.plateauu.simpleirc;
 
 public enum Commands {
     
