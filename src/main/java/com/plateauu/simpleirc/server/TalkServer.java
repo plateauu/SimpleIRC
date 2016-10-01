@@ -2,20 +2,16 @@ package com.plateauu.simpleirc.server;
 
 import com.plateauu.simpleirc.repository.Message;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class TalkServer {
 
     private int port = 13333;
-    private ObjectInputStream in;
-    private ObjectOutputStream out;
+    ObjectOutputStream out;
     private List<ObjectOutputStream> usersOutStreams;
     private List<String> namesList;
 
@@ -38,14 +34,15 @@ public class TalkServer {
 
             Thread t = createThread(clientSocket, counter);
 
-            System.out.println("[SERVER]" + t.getName() + " Connected");
-            Message welcomeMessage = new Message("Server", Boolean.FALSE, "Welcome to localhost");
+            System.out.println("[SERVER]" + t.getName() + " has connected");
+            Message welcomeMessage = new Message("Server", Boolean.FALSE, "Welcome to localhost.server");
             out.writeObject(welcomeMessage);
+            
         }
     }
 
     private Thread createThread(Socket clientSocket, int counter) {
-        Runnable newUser = new UserService(clientSocket, out, this);
+        Runnable newUser = new UserService(clientSocket, this);
         Thread thread = new Thread(newUser);
         thread.setName(++counter + " user");
         thread.start();
@@ -64,9 +61,10 @@ public class TalkServer {
         try {
             for (ObjectOutputStream userOutput : usersOutStreams) {
                 userOutput.writeObject(message);
+                System.out.println("Broadcast message: " + message.toString());
             }
         } catch (IOException ex) {
-            Logger.getLogger(TalkServer.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
 
@@ -88,6 +86,10 @@ public int getUserNameIndex(String name) {
         } else {
             return true;
         }
+    }
+
+    boolean removeOutputStream(ObjectOutputStream out) {
+        return usersOutStreams.remove(out);
     }
 
 }

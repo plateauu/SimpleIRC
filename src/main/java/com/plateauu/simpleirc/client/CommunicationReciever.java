@@ -9,17 +9,19 @@ public class CommunicationReciever implements Runnable {
 
     private ObjectInputStream in;
     private TalkClient client;
+    private boolean isActive;
 
     public CommunicationReciever(ObjectInputStream in, TalkClient client, Socket clientSocket) {
         this.in = in;
         this.client = client;
+        this.isActive = true;
     }
 
     @Override
     public void run() {
         Message message;
         try {
-            while (true) {
+            while (isActive) {
                 message = (Message) in.readObject();
                 boolean isCommand = message.isCommand();
                 if (!isCommand) {
@@ -39,18 +41,28 @@ public class CommunicationReciever implements Runnable {
         switch (message.getCommand()) {
             case name:
                 client.setName(message.getCommandParameter(0));
-                System.out.println("Switched name to " + client.getName());
+                System.out.println(printTimeStamp(message) + "Switched name to " + client.getName());
                 break;
             case list:
                 new RecieveList(message.getCommandParameter(0));
+                break;
+            case exit:
+                System.out.println(printTimeStamp(message) + "Good bye");
+                isActive = false;
                 break;
             default:
                 break;
         }
     }
 
-    private void printMessage(Message message) {
-        System.out.println("<" + message.getName()
-                + "> " + message.getMessage());
+    private String printTimeStamp(Message message) {
+        return "[" + message.getTimeStamp().format(client.getFormatter()) 
+                + "] ";
     }
+
+    private void printMessage(Message message) {
+        System.out.println(printTimeStamp(message) 
+                +"<" + message.getName() + "> " + message.getMessage());
+    }
+
 }

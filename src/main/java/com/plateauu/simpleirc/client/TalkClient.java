@@ -6,12 +6,19 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+/*
+TODO: - Cleanings
+TODO  - alter user name
+TODO  - prevent before ugly name handling during change name;
+*/
 
 public class TalkClient {
 
@@ -20,6 +27,7 @@ public class TalkClient {
     private final int portNumber;
     private ObjectInputStream in;
     private ObjectOutputStream out;
+    private final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public void setName(String name) {
         this.name = name;
@@ -90,13 +98,13 @@ public class TalkClient {
 
         if (isCommand) {
             Commands command = setCommand(messageArray);
-            
             List<String> arguments = parseArgumens(messageArray);
             message = new Message(this.name, isCommand, command, arguments);
+
         } else {
             message = new Message(this.name, isCommand, messageBody);
         }
-        
+
         return message;
     }
 
@@ -110,6 +118,10 @@ public class TalkClient {
                 return Commands.name;
             case "/list":
                 return Commands.list;
+            case "/logout":
+            case "/exit":
+            case "/quit":
+                return Commands.exit;
             default:
                 return Commands.message;
             //TODO interfejs + lista
@@ -139,5 +151,8 @@ public class TalkClient {
         }
         return index;
     }
-
+    
+    public DateTimeFormatter getFormatter(){
+        return DEFAULT_FORMATTER;
+    }
 }

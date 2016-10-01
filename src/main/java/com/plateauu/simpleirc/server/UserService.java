@@ -13,11 +13,14 @@ public class UserService implements Runnable {
     ObjectInputStream in;
     ObjectOutputStream out;
     TalkServer server;
+    String userName;
+    private boolean isActive;
 
-    public UserService(Socket clientSocket, ObjectOutputStream out, TalkServer server) {
+    public UserService(Socket clientSocket, TalkServer server) {
         this.clientSocket = clientSocket;
         this.server = server;
-        this.out = out;
+        this.out = server.out;
+        this.isActive = true;
     }
 
     @Override
@@ -26,7 +29,7 @@ public class UserService implements Runnable {
 
         try {
             in = new ObjectInputStream(clientSocket.getInputStream());
-            while (true) {
+            while (isActive) {
                 message = (Message) in.readObject();
                 System.out.println("Incoming message: " + message.toString());
                 resolveClientRequest(message);
@@ -36,6 +39,8 @@ public class UserService implements Runnable {
             System.out.println(e.getClass());
             System.out.println(e.getMessage());
             System.out.println(e.getStackTrace());
+            server.removeOutputStream(out);
+            e.printStackTrace();
         }
     }
 
@@ -51,6 +56,10 @@ public class UserService implements Runnable {
                 case list:
                     Commandable list = new CommandList(server.getNamesList());
                     out.writeObject(list.performCommand());
+                    break;
+                case exit:
+                    Commandable exit = new CommandExit(server, message.getName(), out);
+                    out.writeObject(exit.performCommand());
                     break;
                 default:
                     break;

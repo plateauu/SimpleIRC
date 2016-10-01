@@ -2,7 +2,7 @@ package com.plateauu.simpleirc.repository;
 
 public enum Commands {
     
-    message, name, list
+    message, name, list, quit, exit, logout
     
  
 }
