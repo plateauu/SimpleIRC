@@ -1,5 +1,9 @@
 package com.plateauu.simpleirc.server;
 
+import com.plateauu.simpleirc.repository.Commands;
+import com.plateauu.simpleirc.repository.Message;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CommandList implements Commandable {
@@ -11,16 +15,17 @@ public class CommandList implements Commandable {
     }
 
     @Override
-    public String performCommand() {
+    public Message performCommand() {
         StringBuilder list = new StringBuilder();
 
-        list.append("commands//list//");
         for (String name : namesList) {
-            list.append(name.toString());
+            list.append(name);
             list.append(", ");
         }
+        
+        List<String> paramList = new ArrayList<>(Arrays.asList(list.toString()));
 
-        return list.toString();
+        return new Message("Server", Boolean.TRUE, Commands.list , paramList);
     }
 
 }

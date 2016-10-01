@@ -1,7 +1,7 @@
 package com.plateauu.simpleirc.server;
 
-import java.io.IOException;
+import com.plateauu.simpleirc.repository.Message;
 
 public interface Commandable {
-    public String performCommand();
+    public Message performCommand();
 }

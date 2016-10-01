@@ -1,4 +1,4 @@
-package com.plateauu.simpleirc;
+package com.plateauu.simpleirc.client;
 
 import com.plateauu.simpleirc.client.TalkClient;
 

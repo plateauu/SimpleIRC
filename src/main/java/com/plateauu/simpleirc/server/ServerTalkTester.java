@@ -1,4 +1,4 @@
-package com.plateauu.simpleirc;
+package com.plateauu.simpleirc.server;
 
 import com.plateauu.simpleirc.server.TalkServer;
 import java.io.IOException;

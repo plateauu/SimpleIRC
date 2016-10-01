@@ -1,18 +1,17 @@
 package com.plateauu.simpleirc.client;
 
-import com.plateauu.simpleirc.Commands;
-import com.plateauu.simpleirc.Message;
+import com.plateauu.simpleirc.repository.Commands;
+import com.plateauu.simpleirc.repository.Message;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-// TODO: make a message object (isCommand:Boolean, messageBody:String, Command:Enum
 
 public class TalkClient {
 
@@ -91,12 +90,13 @@ public class TalkClient {
 
         if (isCommand) {
             Commands command = setCommand(messageArray);
+            
             List<String> arguments = parseArgumens(messageArray);
             message = new Message(this.name, isCommand, command, arguments);
         } else {
-            String txtMessage = messageBody.substring(messageBody.indexOf(" "));
-            message = new Message(this.name, isCommand, txtMessage);
+            message = new Message(this.name, isCommand, messageBody);
         }
+        
         return message;
     }
 
@@ -119,12 +119,25 @@ public class TalkClient {
     }
 
     private List<String> parseArgumens(String[] messageArray) {
-
         List<String> paramList;
-        paramList = Arrays.asList(messageArray);
-        paramList.remove(0);
+        paramList = new ArrayList<>(Arrays.asList(messageArray));
+        int commandIndex = findCommandIndex(paramList);
+        if (commandIndex != -1) {
+            paramList.remove(commandIndex);
+        }
         return paramList;
+    }
 
+    private int findCommandIndex(List<String> paramList) {
+        int index = -1;
+        for (String param : paramList) {
+            if (param.startsWith("/")) {
+                index = paramList.indexOf(param);
+                break;
+            }
+
+        }
+        return index;
     }
 
 }

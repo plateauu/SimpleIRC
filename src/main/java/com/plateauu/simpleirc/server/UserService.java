@@ -1,21 +1,20 @@
 package com.plateauu.simpleirc.server;
 
-import java.io.BufferedReader;
+import com.plateauu.simpleirc.repository.Commands;
+import com.plateauu.simpleirc.repository.Message;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectOutput;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 
 public class UserService implements Runnable {
 
     Socket clientSocket;
-    BufferedReader in;
-    PrintWriter out;
+    ObjectInputStream in;
+    ObjectOutputStream out;
     TalkServer server;
 
-    public UserService(Socket clientSocket, PrintWriter out, TalkServer server) {
+    public UserService(Socket clientSocket, ObjectOutputStream out, TalkServer server) {
         this.clientSocket = clientSocket;
         this.server = server;
         this.out = out;
@@ -23,17 +22,16 @@ public class UserService implements Runnable {
 
     @Override
     public void run() {
-        String message;
+        Message message = null;
 
         try {
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-            while ((message = in.readLine()) != null) {
-                System.out.println("Incoming message: " + message);
+            in = new ObjectInputStream(clientSocket.getInputStream());
+            while (true) {
+                message = (Message) in.readObject();
+                System.out.println("Incoming message: " + message.toString());
                 resolveClientRequest(message);
             }
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println(e.getCause());
             System.out.println(e.getClass());
             System.out.println(e.getMessage());
@@ -41,36 +39,26 @@ public class UserService implements Runnable {
         }
     }
 
-    private void resolveClientRequest(String message) {
-        String[] messageArray = message.split("//");
-        String actualName = messageArray[0];
-        Boolean isCommand = isCommand(message);
-
+    private void resolveClientRequest(Message message) throws IOException {
+        boolean isCommand = message.isCommand();
         if (isCommand) {
-            if (message.contains("/name ")) {
-                messageArray = message.split(" ");
-                String newName = messageArray[1];
-
-                if (newName.length() > 0) {
-                    Commandable changeName = new CommandName(messageArray, actualName, newName, server);
-                    out.println(changeName.performCommand());
-                }
-            }
-
-            if (message.contains("/list")) {
-                Commandable list = new CommandList(server.getNamesList());
-                out.println(list.performCommand());
-            }
-        } else {
-            messageArray = message.split("//");
-            if (messageArray.length > 1) {
-                server.broadcastToAll(messageArray);
+            Commands command = message.getCommand();
+            switch (command) {
+                case name:
+                    Commandable changeName = new CommandName(message, server);
+                    out.writeObject(changeName.performCommand());
+                    break;
+                case list:
+                    Commandable list = new CommandList(server.getNamesList());
+                    out.writeObject(list.performCommand());
+                    break;
+                default:
+                    break;
             }
         }
-    }
 
-    private Boolean isCommand(String message) {
-        return message.contains("///");
+        if (!isCommand) {
+            server.broadcastToAll(message);
+        }
     }
-
 }

@@ -1,4 +1,4 @@
-package com.plateauu.simpleirc;
+package com.plateauu.simpleirc.repository;
 
 public enum Commands {
     

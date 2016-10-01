@@ -1,8 +1,9 @@
-package com.plateauu.simpleirc;
+package com.plateauu.simpleirc.repository;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Message {
+public class Message implements Serializable{
 
     private String senderName;
     private Boolean isCommand;
@@ -27,7 +28,11 @@ public class Message {
         return senderName;
     }
 
-    public Boolean getIsCommand() {
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    } 
+
+    public Boolean isCommand() {
         return isCommand;
     }
 

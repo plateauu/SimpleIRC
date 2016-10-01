@@ -1,6 +1,7 @@
 package com.plateauu.simpleirc.client;
 
-import com.plateauu.simpleirc.Message;
+import com.plateauu.simpleirc.repository.Message;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 
@@ -18,16 +19,17 @@ public class CommunicationReciever implements Runnable {
     public void run() {
         Message message;
         try {
-            while ((message = (Message) in.readObject()) != null) {
-                boolean command = message.getIsCommand();
-                if (!command) {
+            while (true) {
+                message = (Message) in.readObject();
+                boolean isCommand = message.isCommand();
+                if (!isCommand) {
                     printMessage(message);
                 }
-                if (command) {
+                if (isCommand) {
                     recieveCommands(message);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.out.println("Oups");
             e.printStackTrace();
         }
@@ -48,11 +50,7 @@ public class CommunicationReciever implements Runnable {
     }
 
     private void printMessage(Message message) {
-        System.out.println("<" + message.getName() +
-        "> " + message.getMessage()
-    
-
-);    
-
+        System.out.println("<" + message.getName()
+                + "> " + message.getMessage());
     }
 }

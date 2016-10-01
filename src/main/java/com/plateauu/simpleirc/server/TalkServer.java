@@ -1,19 +1,22 @@
 package com.plateauu.simpleirc.server;
 
-import java.io.BufferedReader;
+import com.plateauu.simpleirc.repository.Message;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TalkServer {
 
     private int port = 13333;
-    private BufferedReader in;
-    private PrintWriter out;
-    private List<PrintWriter> usersOutStreams;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private List<ObjectOutputStream> usersOutStreams;
     private List<String> namesList;
 
     public TalkServer() throws IOException {
@@ -30,23 +33,23 @@ public class TalkServer {
 
         while (true) {
             Socket clientSocket = serverSocket.accept();
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
             usersOutStreams.add(out);
 
             Thread t = createThread(clientSocket, counter);
 
             System.out.println("[SERVER]" + t.getName() + " Connected");
-            out.println("Welcome to localhost");
+            Message welcomeMessage = new Message("Server", Boolean.FALSE, "Welcome to localhost");
+            out.writeObject(welcomeMessage);
         }
-
     }
 
     private Thread createThread(Socket clientSocket, int counter) {
         Runnable newUser = new UserService(clientSocket, out, this);
-        Thread t = new Thread(newUser);
-        t.setName(++counter + " user");
-        t.start();
-        return t;
+        Thread thread = new Thread(newUser);
+        thread.setName(++counter + " user");
+        thread.start();
+        return thread;
     }
 
     public List<String> getNamesList() {
@@ -57,15 +60,18 @@ public class TalkServer {
         this.namesList.add(name);
     }
 
-    public void broadcastToAll(String[] messageArray) {
-        if (messageArray.length > 1) {
-            for (PrintWriter userOutput : usersOutStreams) {
-                userOutput.println("<" + messageArray[0] + "> " + messageArray[1]);
+    public void broadcastToAll(Message message) {
+        try {
+            for (ObjectOutputStream userOutput : usersOutStreams) {
+                userOutput.writeObject(message);
             }
+        } catch (IOException ex) {
+            Logger.getLogger(TalkServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public int getUserNameIndex(String name) {
+
+public int getUserNameIndex(String name) {
         int index = -1;
         for (String user : namesList) {
             if (user.equals(name)) {

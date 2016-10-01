@@ -1,23 +1,23 @@
 package com.plateauu.simpleirc.server;
 
-import java.io.PrintWriter;
+import com.plateauu.simpleirc.repository.Message;
 
 public class CommandName implements Commandable {
 
-    String[] messageArray;
     String actualName;
     String newName;
     TalkServer server;
+    Message message;
 
-    public CommandName(String[] messageArray, String actualName, String newName, TalkServer server) {
-        this.messageArray = messageArray;
-        this.actualName = actualName;
-        this.newName = newName;
+    public CommandName(Message message, TalkServer server) {
+        this.actualName = message.getName();
+        this.newName = message.getCommandParameter(0);
         this.server = server;
+        this.message = message;
     }
 
     @Override
-    public String performCommand() {
+    public Message performCommand() {
         
         int actualNameIndex = server.getUserNameIndex(actualName);
 
@@ -26,10 +26,11 @@ public class CommandName implements Commandable {
                 server.getNamesList().remove(actualNameIndex);
             }
             server.addName(newName);
-            return "commands//name//" + newName;
+            message.setSenderName("Server");
+            return message;
 
         } else {
-            return ("[" + actualName + "]" + "Name " + messageArray[1] + " is not available");
+            return new Message("Server", Boolean.FALSE, "Name " + newName + " is not available");
         }
     }
 
