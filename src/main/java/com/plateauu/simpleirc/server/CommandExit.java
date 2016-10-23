@@ -12,10 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- *
- * @author plateauu
- */
 public class CommandExit implements Commandable {
 
     private TalkServer server;

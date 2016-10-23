@@ -2,6 +2,7 @@ package com.plateauu.simpleirc.server;
 
 import com.plateauu.simpleirc.repository.Commands;
 import com.plateauu.simpleirc.repository.Message;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -45,26 +46,29 @@ public class UserService implements Runnable {
     }
 
     private void resolveClientRequest(Message message) throws IOException {
+        Commandable command = null;
         boolean isCommand = message.isCommand();
         if (isCommand) {
-            Commands command = message.getCommand();
-            switch (command) {
+            Commands commandList = message.getCommand();
+            switch (commandList) {
                 case name:
-                    Commandable changeName = new CommandName(message, server);
-                    out.writeObject(changeName.perform());
+                    command = new CommandName(message, server);
                     break;
                 case list:
-                    Commandable list = new CommandList(server.getNamesList());
-                    out.writeObject(list.perform());
+                    command = new CommandList(server.getNamesList());
                     break;
                 case exit:
-                    Commandable exit = new CommandExit(server, message.getName(), out);
-                    out.writeObject(exit.perform());
+                    command = new CommandExit(server, message.getName(), out);
                     break;
                 default:
+                    command = new CommandNull();
                     break;
             }
+
+            out.writeObject(command.perform());
+
         }
+
 
         if (!isCommand) {
             server.broadcastToAll(message);
