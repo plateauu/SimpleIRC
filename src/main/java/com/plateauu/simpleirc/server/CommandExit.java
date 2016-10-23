@@ -29,7 +29,7 @@ public class CommandExit implements Commandable {
     }
 
     @Override
-    public Message performCommand() {
+    public Message perform() {
         Message message;
         boolean isExists = server.isUserExists(userName);
         List<String> paramList = new ArrayList<>(Arrays.asList("Good Bye"));

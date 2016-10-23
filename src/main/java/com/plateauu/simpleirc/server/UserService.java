@@ -51,15 +51,15 @@ public class UserService implements Runnable {
             switch (command) {
                 case name:
                     Commandable changeName = new CommandName(message, server);
-                    out.writeObject(changeName.performCommand());
+                    out.writeObject(changeName.perform());
                     break;
                 case list:
                     Commandable list = new CommandList(server.getNamesList());
-                    out.writeObject(list.performCommand());
+                    out.writeObject(list.perform());
                     break;
                 case exit:
                     Commandable exit = new CommandExit(server, message.getName(), out);
-                    out.writeObject(exit.performCommand());
+                    out.writeObject(exit.perform());
                     break;
                 default:
                     break;

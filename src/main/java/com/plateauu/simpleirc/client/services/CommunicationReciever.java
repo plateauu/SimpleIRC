@@ -1,17 +1,20 @@
-package com.plateauu.simpleirc.client;
+package com.plateauu.simpleirc.client.services;
 
+import com.plateauu.simpleirc.client.TalkClient;
 import com.plateauu.simpleirc.repository.Message;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.time.format.DateTimeFormatter;
 
 public class CommunicationReciever implements Runnable {
 
     private ObjectInputStream in;
     private TalkClient client;
     private boolean isActive;
+    private final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public CommunicationReciever(ObjectInputStream in, TalkClient client, Socket clientSocket) {
+    public CommunicationReciever(ObjectInputStream in, TalkClient client) {
         this.in = in;
         this.client = client;
         this.isActive = true;
@@ -37,17 +40,17 @@ public class CommunicationReciever implements Runnable {
         }
     }
 
-    private void recieveCommands(Message message) {
+    public void recieveCommands(Message message) {
         switch (message.getCommand()) {
             case name:
                 client.setName(message.getCommandParameter(0));
-                System.out.println(printTimeStamp(message) + "Switched name to " + client.getName());
+                System.out.println(getTimeStamp(message) + "Switched name to " + client.getName());
                 break;
             case list:
                 new RecieveList(message.getCommandParameter(0));
                 break;
             case exit:
-                System.out.println(printTimeStamp(message) + "Good bye");
+                System.out.println(getTimeStamp(message) + "Good bye");
                 isActive = false;
                 break;
             default:
@@ -55,14 +58,16 @@ public class CommunicationReciever implements Runnable {
         }
     }
 
-    private String printTimeStamp(Message message) {
-        return "[" + message.getTimeStamp().format(client.getFormatter()) 
+    public String getTimeStamp(Message message) {
+        return "[" + message.getTimeStamp().format(DEFAULT_FORMATTER)
                 + "] ";
     }
 
-    private void printMessage(Message message) {
-        System.out.println(printTimeStamp(message) 
+    public void printMessage(Message message) {
+        System.out.println(getTimeStamp(message)
                 +"<" + message.getName() + "> " + message.getMessage());
     }
+
+
 
 }

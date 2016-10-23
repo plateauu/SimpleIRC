@@ -15,7 +15,7 @@ public class CommandList implements Commandable {
     }
 
     @Override
-    public Message performCommand() {
+    public Message perform() {
         StringBuilder list = new StringBuilder();
 
         for (String name : namesList) {

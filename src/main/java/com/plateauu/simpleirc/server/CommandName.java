@@ -17,7 +17,7 @@ public class CommandName implements Commandable {
     }
 
     @Override
-    public Message performCommand() {
+    public Message perform() {
         
         int actualNameIndex = server.getUserNameIndex(actualName);
 

@@ -45,10 +45,6 @@ public class Message implements Serializable {
         return command;
     }
 
-    public List<String> getCommandParameter() {
-        return commandArguments;
-    }
-
     public String getCommandParameter(int indexOf) {
         return commandArguments.get(indexOf);
     }
@@ -57,20 +53,20 @@ public class Message implements Serializable {
         return message;
     }
 
-    @Override
-    public String toString() {
-        return "Message{Timestamp " + getFormattedTimeStamp() + ", name=" + senderName 
-                + ", isCommand=" + isCommand + ", command=" + command 
-                + ", commandParameter=" + commandArguments + ", message=" + message + '}';
-        
-    }
-    
     public String getFormattedTimeStamp(){
         return timestamp.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
-    
+
     public LocalDateTime getTimeStamp(){
         return timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{Timestamp " + getFormattedTimeStamp() + ", name=" + senderName
+                + ", isCommand=" + isCommand + ", command=" + command
+                + ", commandParameter=" + commandArguments + ", message=" + message + '}';
+
     }
 
 }
