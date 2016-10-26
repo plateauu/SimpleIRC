@@ -28,10 +28,11 @@ public class CommandParser {
             case "/exit":
             case "/quit":
                 return Commands.exit;
+            case "/topic":
+                return Commands.topic;
             default:
                 return Commands.message;
             //TODO interfejs + lista
-            //TODO metoda na nieznaną komendę
         }
 
     }

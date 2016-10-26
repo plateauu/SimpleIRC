@@ -1,7 +1,8 @@
-package com.plateauu.simpleirc.server;
+package com.plateauu.simpleirc.server.services;
 
 import com.plateauu.simpleirc.repository.Commands;
 import com.plateauu.simpleirc.repository.Message;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

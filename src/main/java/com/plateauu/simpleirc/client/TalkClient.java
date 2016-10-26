@@ -1,7 +1,7 @@
 package com.plateauu.simpleirc.client;
 
-import com.plateauu.simpleirc.client.services.CommunicationReciever;
 import com.plateauu.simpleirc.client.repository.MessageCreator;
+import com.plateauu.simpleirc.client.services.CommunicationReceiver;
 import com.plateauu.simpleirc.repository.Message;
 
 import java.io.IOException;
@@ -11,7 +11,6 @@ import java.net.Socket;
 import java.util.Scanner;
 
 /*
-TODO: - Cleanings
 TODO  - alter user name
 TODO  - prevent before ugly name handling during change name;
 TODO -  remove name after kill server
@@ -49,7 +48,7 @@ public class TalkClient {
             in = new ObjectInputStream(clientSocket.getInputStream());
             System.out.println("[" + name + "] Connection established");
 
-            Thread t = new Thread(new CommunicationReciever(in, this));
+            Thread t = new Thread(new CommunicationReceiver(in, this));
             t.start();
 
             logInServer();

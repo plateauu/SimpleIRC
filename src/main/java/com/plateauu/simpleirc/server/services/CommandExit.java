@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.plateauu.simpleirc.server;
+package com.plateauu.simpleirc.server.services;
 
 import com.plateauu.simpleirc.repository.Commands;
 import com.plateauu.simpleirc.repository.Message;
+import com.plateauu.simpleirc.server.TalkServer;
+
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;

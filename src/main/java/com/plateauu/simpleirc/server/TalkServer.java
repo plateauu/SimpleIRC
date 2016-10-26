@@ -1,6 +1,7 @@
 package com.plateauu.simpleirc.server;
 
 import com.plateauu.simpleirc.repository.Message;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -11,18 +12,20 @@ import java.util.List;
 public class TalkServer {
 
     private int port = 13333;
-    ObjectOutputStream out;
+    private ObjectOutputStream out;
     private List<ObjectOutputStream> usersOutStreams;
     private List<String> namesList;
+    private String channelTopic;
 
     public TalkServer() throws IOException {
         establishServer();
     }
 
-    public void establishServer() throws IOException {
+    private void establishServer() throws IOException {
 
         usersOutStreams = new ArrayList<>();
         namesList = new ArrayList<>();
+        channelTopic = "Temporary topic...";
         int counter = 0;
 
         ServerSocket serverSocket = new ServerSocket(port);
@@ -37,7 +40,9 @@ public class TalkServer {
             System.out.println("[SERVER]" + t.getName() + " has connected");
             Message welcomeMessage = new Message("Server", Boolean.FALSE, "Welcome to localhost.server");
             out.writeObject(welcomeMessage);
-            
+            welcomeMessage = new Message("Server", Boolean.FALSE, "Topic is: [" + channelTopic + "]");
+            out.writeObject(welcomeMessage);
+
         }
     }
 
@@ -69,7 +74,7 @@ public class TalkServer {
     }
 
 
-public int getUserNameIndex(String name) {
+    public int getUserNameIndex(String name) {
         int index = -1;
         for (String user : namesList) {
             if (user.equals(name)) {
@@ -79,7 +84,7 @@ public int getUserNameIndex(String name) {
         return index;
     }
 
-    boolean isUserExists(String name) {
+    public boolean isUserExists(String name) {
         int index = getUserNameIndex(name);
         if (index == -1) {
             return false;
@@ -88,8 +93,15 @@ public int getUserNameIndex(String name) {
         }
     }
 
-    boolean removeOutputStream(ObjectOutputStream out) {
+    public boolean removeOutputStream(ObjectOutputStream out) {
         return usersOutStreams.remove(out);
     }
 
+    ObjectOutputStream getOut() {
+        return out;
+    }
+
+    public void setChannelTopic(String channelTopic) {
+        this.channelTopic = channelTopic;
+    }
 }

@@ -2,19 +2,19 @@ package com.plateauu.simpleirc.client.services;
 
 import com.plateauu.simpleirc.client.TalkClient;
 import com.plateauu.simpleirc.repository.Message;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.Socket;
 import java.time.format.DateTimeFormatter;
 
-public class CommunicationReciever implements Runnable {
+public class CommunicationReceiver implements Runnable {
 
     private ObjectInputStream in;
     private TalkClient client;
     private boolean isActive;
     private final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public CommunicationReciever(ObjectInputStream in, TalkClient client) {
+    public CommunicationReceiver(ObjectInputStream in, TalkClient client) {
         this.in = in;
         this.client = client;
         this.isActive = true;
@@ -31,7 +31,7 @@ public class CommunicationReciever implements Runnable {
                     printMessage(message);
                 }
                 if (isCommand) {
-                    recieveCommands(message);
+                    receiveCommands(message);
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -40,7 +40,7 @@ public class CommunicationReciever implements Runnable {
         }
     }
 
-    public void recieveCommands(Message message) {
+    public void receiveCommands(Message message) {
         switch (message.getCommand()) {
             case name:
                 client.setName(message.getCommandParameter(0));
@@ -50,6 +50,8 @@ public class CommunicationReciever implements Runnable {
                 new RecieveList(message.getCommandParameter(0));
                 break;
             case exit:
+            case logout:
+            case quit:
                 System.out.println(getTimeStamp(message) + "Good bye");
                 isActive = false;
                 break;

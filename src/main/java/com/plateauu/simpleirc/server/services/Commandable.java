@@ -1,4 +1,4 @@
-package com.plateauu.simpleirc.server;
+package com.plateauu.simpleirc.server.services;
 
 import com.plateauu.simpleirc.repository.Message;
 

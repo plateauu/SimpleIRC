@@ -1,6 +1,7 @@
-package com.plateauu.simpleirc.server;
+package com.plateauu.simpleirc.server.services;
 
 import com.plateauu.simpleirc.repository.Message;
+import com.plateauu.simpleirc.server.TalkServer;
 
 public class CommandName implements Commandable {
 
@@ -18,7 +19,7 @@ public class CommandName implements Commandable {
 
     @Override
     public Message perform() {
-        
+
         int actualNameIndex = server.getUserNameIndex(actualName);
 
         if (!server.isUserExists(newName)) {
@@ -27,6 +28,10 @@ public class CommandName implements Commandable {
             }
             server.addName(newName);
             message.setSenderName("Server");
+            Message broadcastMessage = new Message("Server", Boolean.FALSE, this.actualName + " change name into " + this.newName);
+            if (!actualName.equals(newName)) {
+                server.broadcastToAll(broadcastMessage);
+            }
             return message;
 
         } else {

@@ -49,6 +49,10 @@ public class Message implements Serializable {
         return commandArguments.get(indexOf);
     }
 
+    public List<String> getCommandParameter() {
+        return commandArguments;
+    }
+
     public String getMessage() {
         return message;
     }
